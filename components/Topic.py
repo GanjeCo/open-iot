@@ -1,7 +1,8 @@
 
 import paho.mqtt.client as mqtt
 
-class Topic(object):
+from .Connection import Connection
+class Topic(Connection):
     '''
     A wrapper on paho.mqtt protocol  
     '''
