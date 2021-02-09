@@ -4,9 +4,10 @@ from .Connection import Connection
 
 class Thing():
 
-    def __init__(self, name):
+    def __init__(self, name, clients):
         self.name = name
-        self.connections = []
+        self.connections = {}
+        self.clients = clients
 
     def remove_connection(self, connection_to_remove):
         for connection in self.connections:
@@ -14,8 +15,10 @@ class Thing():
                 #TODO: remove the event
                 del connection
 
-    def add_connection(self, connection_to_add):
-        if issubclass(connection_to_add, Connection):
-            self.connections.append(connection_to_add)
-        else:
-            raise Exception('connection must be instace of Topic')
+    def add_connection(self, *args):
+        for connenction in args:
+            if isinstance(connenction, Connection):
+                self.connections[connenction.name] = connenction
+                print(f'connection {connenction} added to thing {self.name}')
+            else:
+                raise Exception("connections must be instance of Connection class")

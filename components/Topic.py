@@ -6,18 +6,20 @@ class Topic(Connection):
     '''
     A wrapper on paho.mqtt protocol  
     '''
-    def __init__(self, client, topic, name='', sub_event=None, initial_subscribe=False, qos=0):
+    def __init__(self, client, topic, event, name='', initial_subscribe=False, qos=0):
         '''
         constructor
         '''
+        super().__init__(name)
         self.client = client 
         self.topic = topic
-        self.name = name
         self.qos = qos
         self._is_sub = False
-
-        if sub_event != None and callable(sub_event):
-            self.assign_sub_funtion(sub_event)
+        if callable(event):
+            self._event = event
+            self.assign_subscribe_funtion(self._event)
+        else:
+            raise Exception("event must be callable function")
 
         if initial_subscribe == True:
             self.do_subscribe()
@@ -38,7 +40,7 @@ class Topic(Connection):
         self._is_sub = False
         return False
 
-    def is_subscribe(self):
+    def is_subscribed(self):
         '''
         returns True if is subscribed to the topic 
         '''
@@ -51,7 +53,7 @@ class Topic(Connection):
         '''
         self.client.publish(self.topic, payload=payload, qos=qos)
 
-    def assign_sub_funtion(self, subscribe_event):
+    def assign_subscribe_funtion(self, subscribe_event):
         '''
         assign subscribe_event to the Topic 
         if  subscribe_event == None will unassign all events on topic
@@ -64,7 +66,7 @@ class Topic(Connection):
         else:
             raise Exception('subscribe_event must be callable or None')
 
-    def assign_unsub_function(self):
+    def assign_unsubscribe_function(self):
         '''
         un assign all callbacks from the Topic
         '''
@@ -73,12 +75,6 @@ class Topic(Connection):
     def make_payload(self):
         '''
         can be used to produce the payload for the Topic
-        '''
-        raise NotImplementedError("This method is not Implemented!")
-
-    def _sub_event(self, client, userdata, message):
-        '''
-        the actual event to be called if function is assigned to the Topic
         '''
         raise NotImplementedError("This method is not Implemented!")
 
