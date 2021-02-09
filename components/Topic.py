@@ -6,7 +6,7 @@ class Topic(Connection):
     '''
     A wrapper on paho.mqtt protocol  
     '''
-    def __init__(self, client, topic, event, name='', initial_subscribe=False, qos=0):
+    def __init__(self, client, topic, event, name='', qos=0):
         '''
         constructor
         '''
@@ -21,8 +21,7 @@ class Topic(Connection):
         else:
             raise Exception("event must be callable function")
 
-        if initial_subscribe == True:
-            self.do_subscribe()
+        self.do_subscribe()
         
     def do_subscribe(self):
         '''

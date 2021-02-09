@@ -2,7 +2,9 @@
 
 class Connection():
     def __init__(self, name):
+        # self.thing = thing
         self.name = name
+        # self.name = thing.name + '-' + name
 
     def _event(self):
         '''

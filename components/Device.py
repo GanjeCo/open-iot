@@ -4,9 +4,9 @@ import paho.mqtt.client as mqtt
 
 class Device():
     
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, name, hostname):
         self.name = name
-        self._hostname = "5.253.26.31"
+        self._hostname = hostname
         self.things = {}
         self.clients = {}
         
@@ -22,8 +22,9 @@ class Device():
         print("log: ", buf)
 
     def add_thing(self, thing_name_to_add):
-        self.things[thing_name_to_add] = Thing(thing_name_to_add, self.clients)
+        self.things[thing_name_to_add] = Thing(thing_name_to_add, self)
         print(f'thing {thing_name_to_add} added to device {self.name}')
+        return self.things[thing_name_to_add]
 
     def remove_thing(self, thing_name_to_remove):
         pass

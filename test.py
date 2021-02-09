@@ -10,14 +10,15 @@ def printer1(client, userdata, message):
 def printer2(client, userdata, message):
     print("printer2")
 
-device = Device("Ganjine")
+device = Device("Ganjine", "5.253.26.31")
 
-device.add_thing('thing-name')
+device.add_thing('sensor1').add_connection(
+    Topic(device.clients['mqtt'], 'salam', printer1, 'topic-name', qos=2)
+    )
 
-device.things['thing-name'].add_connection(
-    Topic(device.clients['mqtt'], 'salam', printer1, 'topic-name', qos=2, initial_subscribe=True),
-    Topic(device.clients['mqtt'], 'aleyk', printer2, 'topic-name2', qos=2, initial_subscribe=True)
-)
+device.add_thing('sensor2').add_connection(
+    Topic(device.clients['mqtt'], 'asd/salam/#', printer2, 'topic2-name', qos=2)
+    )
 
 
 device.clients['mqtt'].loop_forever()

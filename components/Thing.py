@@ -4,10 +4,10 @@ from .Connection import Connection
 
 class Thing():
 
-    def __init__(self, name, clients):
-        self.name = name
+    def __init__(self, name, device):
+        self.name = device.name + '-' + name
         self.connections = {}
-        self.clients = clients
+        self.device = device
 
     def remove_connection(self, connection_to_remove):
         for connection in self.connections:
