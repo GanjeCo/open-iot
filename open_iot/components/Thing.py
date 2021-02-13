@@ -5,7 +5,7 @@ from .Connection import Connection
 class Thing():
 
     def __init__(self, name, device):
-        self.name = device.name + '-' + name
+        self.name = name
         self.connections = {}
         self.device = device
 
