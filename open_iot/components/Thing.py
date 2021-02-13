@@ -1,6 +1,6 @@
-
 from .Topic import Topic
 from .Connection import Connection
+
 
 class Thing():
 

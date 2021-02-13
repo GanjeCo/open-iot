@@ -1,10 +1,9 @@
-
-import paho.mqtt.client as mqtt
-
 from .Connection import Connection
+
+
 class Topic(Connection):
     '''
-    A wrapper on paho.mqtt protocol  
+    A wrapper on paho.mqtt protocol
     '''
     def __init__(self, client, topic, event, name='', qos=0):
         '''
