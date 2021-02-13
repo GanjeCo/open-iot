@@ -4,7 +4,10 @@ import paho.mqtt.client as mqtt
 
 class Device():
     
-    def __init__(self, name, hostname):
+    def __init__(self, name, direction, category, ID, hostname):
+        self.direction = direction
+        self.category = category
+        self.ID = ID
         self.name = name
         self._hostname = hostname
         self.things = {}
