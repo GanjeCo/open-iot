@@ -2,6 +2,7 @@ from .Thing import Thing
 
 import paho.mqtt.client as mqtt
 
+
 class Device():
     
     def __init__(self, name, direction, category, ID, hostname):
