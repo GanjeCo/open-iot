@@ -14,7 +14,7 @@ def printer1(client, userdata, message):
 def printer2(client, userdata, message):
     print("printer2")
 
-device = Device("Ganjine", 'client', 'Ganjine', '13', "5.253.26.31")
+device = Device("Ganjine", '13', "5.253.26.31")
 
 # device.create_mqtt_client()
 # device.add_thing('sensor1').add_connection(
