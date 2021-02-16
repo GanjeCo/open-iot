@@ -2,10 +2,7 @@ import time
 import sys
 sys.path.append('./')
 
-from open_iot.components.Topic import Topic
-from open_iot.components.Thing import Thing
-from open_iot.components.Device import Device
-
+from open_iot.components import Device
 
 
 def printer1(client, userdata, message):
