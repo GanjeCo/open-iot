@@ -1,80 +1,77 @@
-from .Thing import Thing
+import json
+
 from .Topic import Topic
 
 import paho.mqtt.client as mqtt
 
+import time
 
 class Device():
     
-    def __init__(self, name, ID, hostname):
-        self.ID = ID
+    def __init__(self, ID, hostname, name='ganjine', is_server=False):
         self.name = name
+        self.ID = ID
         self._hostname = hostname
-        self.things = {}
-        self.clients = {}
+        self.topics = {}
+        self.settings = []
+        self.is_init = True
 
         self.create_mqtt_client()
 
-        # fetch_settings()
-        self.settings = [
-            {'event_name':'lock1', 'event_function':'my_function', 'event_args':'', 'category': 'ganjine', 'direction': 'from_server'},
-            {'event_name':'lock2', 'event_function':'my_function', 'event_args':'', 'category': 'ganjine', 'direction': 'from_server'}
-        ]
+    def create_mqtt_client(self):
+        self.client = mqtt.Client(self.name + "_" + self.ID)
 
-        # create connections
-        self.bootstrap_connections()
+        self.client.on_log = self._on_log
+        self.client.on_connect = self._on_connect
+
+        self.client.connect(self._hostname)
+
+    def add_topic(self, topic_name, callerback, category, qos=1):
+        if topic_name in self.topics.keys():
+            return False
+        else:
+            self.topics[topic_name] = Topic(
+                self, 
+                '{0}/{1}/{2}/{3}'.format('from_server', self.name, self.ID, category), 
+                callerback,
+                topic_name,
+                qos=qos
+                )
+            return True
+
+    def remove_topic(self, thing_name_to_remove):
+        pass
+
+    def _on_connect(self, client, userdata, flags, rc):
+        self.request_settings()
+
+        if not self.is_init:
+            for topic in self.topics:
+                self.topics[topic].do_subscribe()
+                
+        self.is_init = False
 
     def _on_log(self, client, userdata, level, buf):
         print("log: ", buf)
 
-    def add_thing(self, thing_name_to_add):
-        self.things[thing_name_to_add] = Thing(thing_name_to_add, self)
-        print(f'thing {thing_name_to_add} added to device {self.name}')
-        return self.things[thing_name_to_add]
-
-    def remove_thing(self, thing_name_to_remove):
+    def request_settings(self):
         pass
-
-    def create_mqtt_client(self):
-        self.clients['mqtt'] = mqtt.Client()
-
-        self.clients['mqtt'].on_log = self._on_log
-
-        self.clients['mqtt'].connect(self._hostname)
-
-    def fetch_settings(self):
         # fetch settings from server
-        pass
+        self.add_topic(
+            'settings',
+            self.set_settings,
+            'settings',
+        )
 
-    def my_function(self, client, userdata, message):
-        print('hello', message.payload)
-    
-    def bootstrap_connections(self):
-        for thing in self.settings:
-            print(thing['event_name'])
+        self.publisher('settings')
 
-            self.add_thing("{0}_{1}".format(self.ID, thing['event_name']))\
-                .add_connection(
-                    Topic(
-                        self.clients['mqtt'],
-                        '{0}/{1}/{2}/{3}'.format(thing['direction'], thing['category'], self.ID, thing['event_name']),
-                        eval('self.' + thing['event_function']),
-                        'topic-name',
-                        qos=2
-                    )
-                )
+    def set_settings(self, client, userdata, message):
+        self.settings = json.loads(message.payload)
 
-            # for event in thing['events']:
-            #     self.add_thing('{0}_{1}_{2}'.format(self.ID, thing['pin'], event[0]))\
-            #         .add_connection(
-            #             Topic(
-            #                 self.clients['mqtt'],
-            #                 'from_server/ganjine/{0}/{1}'.format(self.ID, event[0], , ),
-            #                 eval('self.'+ event[1]),
-            #                 'topic-name',
-            #                 qos=2
-            #         )
-            #     )
-            # print('thing', thing['pin'])
-            # print(self.things)
+    def publisher(self, topic, payload='', qos=0):
+        self.client.publish(
+            '{0}/{1}/{2}/{3}'.format('to_server', self.name, self.ID, topic),
+            payload=payload, 
+            qos=qos
+            )
 

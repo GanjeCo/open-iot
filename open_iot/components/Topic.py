@@ -1,16 +1,13 @@
-from .Connection import Connection
-
-
-class Topic(Connection):
+class Topic():
     '''
     A wrapper on paho.mqtt protocol
     '''
-    def __init__(self, client, topic, event, name='', qos=0):
+    def __init__(self, device, topic, event, name, qos=0):
         '''
         constructor
         '''
-        super().__init__(name)
-        self.client = client 
+        self.name = name 
+        self.device = device 
         self.topic = topic
         self.qos = qos
         self._is_sub = False
@@ -26,7 +23,7 @@ class Topic(Connection):
         '''
         do subscribe
         '''
-        self.client.subscribe(self.topic, qos=self.qos)
+        self.device.client.subscribe(self.topic, qos=self.qos)
         self._is_sub = True
         return True
 
@@ -34,9 +31,9 @@ class Topic(Connection):
         '''
         do unsubscribe
         '''
-        self.client.unsubscribe(self.topic)
+        self.device.client.unsubscribe(self.topic)
         self._is_sub = False
-        return False
+        return True
 
     def is_subscribed(self):
         '''
@@ -49,7 +46,7 @@ class Topic(Connection):
         publish payload to the topic with given qos
         payload must be str
         '''
-        self.client.publish(self.topic, payload=payload, qos=qos)
+        self.device.client.publish(self.topic, payload=payload, qos=qos)
 
     def assign_subscribe_funtion(self, subscribe_event):
         '''
@@ -60,7 +57,7 @@ class Topic(Connection):
             self.assign_unsub_function()
         elif callable(subscribe_event):
             self._subscribe_event = subscribe_event
-            self.client.message_callback_add(self.topic, self._subscribe_event)
+            self.device.client.message_callback_add(self.topic, self._subscribe_event)
         else:
             raise Exception('subscribe_event must be callable or None')
 
@@ -68,7 +65,7 @@ class Topic(Connection):
         '''
         un assign all callbacks from the Topic
         '''
-        self.client.message_callback_remove(self.topic)
+        self.device.client.message_callback_remove(self.topic)
 
     def make_payload(self):
         '''
